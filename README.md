@@ -1,4 +1,3 @@
-# Fractals in Rust
+# Fractals in C++
 Complex numbers and fractals
----------------------------------------------------------
-Raylib (C/C++) wrapper
+Raylib graphic library
