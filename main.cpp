@@ -10,7 +10,8 @@ using namespace std;
 
 typedef struct {
     int dim;
-    vector<complex<double>> plane;
+    int density;
+    vector<complex<double>> mat;
 } Plane;
 
 vector<double> linspace(double a, double b, int n) {
@@ -20,48 +21,61 @@ vector<double> linspace(double a, double b, int n) {
     return v;
 }
 
-vector<complex<double>> complex_plane(int xmin, int xmax, int ymin, int ymax, int density) {
-    vector<double> re = linspace(xmin, xmax, density);
-    vector<double> im = linspace(ymin, ymax, density);
+vector<complex<double>> complex_mat(Plane p) {
+    vector<double> re = linspace(0, p.dim, p.density);
+    vector<double> im = linspace(0, p.dim, p.density);
 
-    vector<complex<double>> plane(square(density));
-    for (int i=0; i<density; i++)
-        for (int j=0; j<density; j++)
-            plane[i * density + j] = re[j] + im[i] * 1i;
+    vector<complex<double>> mat;
 
-    return plane;
+    for (int i=0; i<p.density; i++)
+        for (int j=0; j<p.density; j++)
+            mat.push_back(re[j] + im[i] * 1i);
+            // mat[i * density + j] = re[j] + im[i] * 1i;
+
+    return mat;
 }
 
-vector<bool> find_stable(vector<complex<double>> plane, int n_iterations) {
-    ; 
+void draw_plane(Plane p, int xi, int yi, int r) {
+    for (int y = yi; y > yi - p.dim; y -= (int)(p.dim/p.density)) {
+        for (int x = xi; x < xi + p.dim; x += (int)(p.dim/p.density)) {
+            DrawCircle(x, y, r, RED);
+        }
+    }
 }
 
-void print_plane(vector<complex<double>> plane, int n) {
-    for (int i=0; i<n; i++) {
-        for (int j=0; j<n; j++)
-            cout << plane[i * n + j] << " ";
+void print_plane(Plane p) {
+    for (int i=0; i<p.density; i++) {
+        for (int j=0; j<p.density; j++)
+            cout << p.mat[i * p.density + j] << " ";
         cout << endl;
     }
 }
 
 int main() {
-    int n = 10;
-    vector<complex<double>> plane = complex_plane(0, 5, 0, 5, n);
+    const int L = 800;
 
+    int r = 5;
+    int xi = r*2;
+    int yi = L - r*2;
 
-    // const int X = 1000;
-    // const int Y =  800;
+    Plane p;
 
-    // InitWindow(X, Y, "Mandelbrot");
-    // SetTargetFPS(30);
+    p.dim = L - r*2;
+    p.density = 50;
+    p.mat = complex_mat(p);
 
-    // while (!WindowShouldClose()) {
-    //     BeginDrawing();
-    //     ClearBackground(BLACK);
+    InitWindow(L, L, "Mandelbrot");
+    SetTargetFPS(30);
 
-    //     EndDrawing();
-    // }
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
 
-    // CloseWindow();
-    // return 0;
+        draw_plane(p, xi, yi, r);
+
+        EndDrawing();
+    }
+
+    CloseWindow();
+    return 0;
 }
