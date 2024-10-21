@@ -13,6 +13,7 @@ const double zoomx = 3.f;
 const int max_iterations = 100;
 
 void mandelbrot();
+Color gradient(int n);
 
 int main() {
     InitWindow(X, Y, "Mandelbrot");
@@ -20,6 +21,7 @@ int main() {
 
     Camera2D camera = {0};
     camera.zoom = 1.0f;
+    camera.target = (Vector2){X/2, Y/2};
 
     while (!WindowShouldClose()) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
@@ -56,6 +58,8 @@ int main() {
 }
 
 void mandelbrot() {
+    /* for (int y = -Y; y < Y; y++) { */
+    /*     for (int x = -X; x < X; x++) { */
     for (int y = -Y/2; y < Y/2; y++) {
         for (int x = -X/2; x < X/2; x++) {
             double a = (double)x / (double)X * zoomx;
@@ -78,11 +82,32 @@ void mandelbrot() {
                 n++;
             }
             
-            double brightness = (double)n / (double)max_iterations * 255.f;
-
-            Color col = {brightness, brightness, brightness, 255};
+            Color col = gradient(n);
             DrawPixel(x+X/2+shiftx, y+Y/2, col);
         }
     }
 }
 
+Color gradient(int n) {
+    double bright = (double)n / (double)max_iterations * 255.f;
+
+#if 0
+    return (Color){bright, bright, bright, 255};
+#endif
+
+#if 1
+    unsigned char r = (bright-22)/323 * 219 + ( 1 - (bright-22)/323 ) * 250;
+    unsigned char g = (bright-22)/323 *  50 + ( 1 - (bright-22)/323 ) * 219;
+    unsigned char b = (bright-22)/323 *  54 + ( 1 - (bright-22)/323 ) * 219;
+
+    return (Color){r, g, b, 255};
+#endif
+
+#if 0
+    unsigned char r = (unsigned char)(9.f * (1.f - bright) * bright * bright * bright * 255.f);
+    unsigned char g = (unsigned char)(15.f * (1.f - bright) * (1.f - bright) * bright * bright * 255.f);
+    unsigned char b = (unsigned char)(8.5 * (1.f - bright) * (1.f - bright) * (1.f - bright) * bright * 255.f);
+
+    return (Color){r, g, b, 255};
+#endif
+}
