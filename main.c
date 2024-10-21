@@ -23,6 +23,9 @@ int main() {
     camera.zoom = 1.0f;
     camera.target = (Vector2){X/2, Y/2};
 
+    int W = X;
+    int H = Y;
+
     while (!WindowShouldClose()) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             Vector2 delta = GetMouseDelta();
@@ -46,7 +49,7 @@ int main() {
 
             BeginMode2D(camera);
 
-                mandelbrot();
+                mandelbrot(W, H);
 
             EndMode2D();
 
@@ -57,7 +60,7 @@ int main() {
     return 0;
 }
 
-void mandelbrot() {
+void mandelbrot(int X, int Y) {
     /* for (int y = -Y; y < Y; y++) { */
     /*     for (int x = -X; x < X; x++) { */
     for (int y = -Y/2; y < Y/2; y++) {
@@ -91,11 +94,11 @@ void mandelbrot() {
 Color gradient(int n) {
     double bright = (double)n / (double)max_iterations * 255.f;
 
-#if 0
+#if 1
     return (Color){bright, bright, bright, 255};
 #endif
 
-#if 1
+#if 0
     unsigned char r = (bright-22)/323 * 219 + ( 1 - (bright-22)/323 ) * 250;
     unsigned char g = (bright-22)/323 *  50 + ( 1 - (bright-22)/323 ) * 219;
     unsigned char b = (bright-22)/323 *  54 + ( 1 - (bright-22)/323 ) * 219;
