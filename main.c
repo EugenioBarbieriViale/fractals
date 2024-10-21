@@ -5,14 +5,14 @@
 #define square(x) (x)*(x)
 
 int main() {
-    const int X = 400;
-    const int Y = 400;
+    const int X = 600;
+    const int Y = 600;
+    const int shiftx = 100;
 
-    double zoomy = 1.f;
-    double zoomx = 1.f;
+    const double zoomy = 2.f;
+    const double zoomx = 3.f;
 
-    double step = 0.1f;
-    int max_iterations = 100;
+    const int max_iterations = 100;
 
     InitWindow(X, Y, "Mandelbrot");
     SetTargetFPS(30);
@@ -21,20 +21,8 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        if (IsKeyDown(KEY_UP)) 
-            zoomy -= step;
-
-        if (IsKeyDown(KEY_DOWN)) 
-            zoomy += step;
-
-        if (IsKeyDown(KEY_RIGHT))
-            zoomx -= step;
-
-        if (IsKeyDown(KEY_LEFT)) 
-            zoomx += step;
-
-        for (int y = 0; y < Y; y++) {
-            for (int x = 0; x < X; x++) {
+        for (int y = -Y/2; y < Y/2; y++) {
+            for (int x = -X/2; x < X/2; x++) {
                 double a = (double)x / (double)X * zoomx;
                 double b = (double)y / (double)Y * zoomy;
 
@@ -55,12 +43,10 @@ int main() {
                     n++;
                 }
                 
-                int brightness = n / max_iterations * 255;
-                if (n == max_iterations)
-                    brightness = 255;
+                double brightness = (double)n / (double)max_iterations * 255.f;
 
-                Color col = {brightness, brightness, brightness, brightness};
-                DrawPixel(x, y, col);
+                Color col = {brightness, brightness, brightness, 255};
+                DrawPixel(x+X/2+shiftx, y+Y/2, col);
             }
         }
 
