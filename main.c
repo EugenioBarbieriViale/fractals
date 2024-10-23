@@ -5,7 +5,9 @@
 
 const int X = 600;
 const int Y = 600;
+
 const int shiftx = 100;
+const int shifty = 50;
 
 const double zoomy = 2.f;
 const double zoomx = 3.f;
@@ -61,10 +63,8 @@ int main() {
 }
 
 void mandelbrot(int X, int Y) {
-    /* for (int y = -Y; y < Y; y++) { */
-    /*     for (int x = -X; x < X; x++) { */
-    for (int y = -Y/2; y < Y/2; y++) {
-        for (int x = -X/2; x < X/2; x++) {
+    for (int y = -Y/2 - shifty; y < Y/2 + shifty; y++) {
+        for (int x = -X/2 - shiftx; x < X/2; x++) {
             double a = (double)x / (double)X * zoomx;
             double b = (double)y / (double)Y * zoomy;
 
@@ -79,14 +79,14 @@ void mandelbrot(int X, int Y) {
                 a = re + pa;
                 b = im + pb;
 
-                if (square(a) + square(b) > 2)
+                if (square(a) + square(b) > 100)
                     break;
 
                 n++;
             }
             
             Color col = gradient(n);
-            DrawPixel(x+X/2+shiftx, y+Y/2, col);
+            DrawPixel(x + X, y + Y, col);
         }
     }
 }
@@ -94,19 +94,10 @@ void mandelbrot(int X, int Y) {
 Color gradient(int n) {
     double bright = (double)n / (double)max_iterations * 255.f;
 
-#if 1
+#if 0
     return (Color){bright, bright, bright, 255};
-#endif
 
-#if 0
-    unsigned char r = (bright-22)/323 * 219 + ( 1 - (bright-22)/323 ) * 250;
-    unsigned char g = (bright-22)/323 *  50 + ( 1 - (bright-22)/323 ) * 219;
-    unsigned char b = (bright-22)/323 *  54 + ( 1 - (bright-22)/323 ) * 219;
-
-    return (Color){r, g, b, 255};
-#endif
-
-#if 0
+#else
     unsigned char r = (unsigned char)(9.f * (1.f - bright) * bright * bright * bright * 255.f);
     unsigned char g = (unsigned char)(15.f * (1.f - bright) * (1.f - bright) * bright * bright * 255.f);
     unsigned char b = (unsigned char)(8.5 * (1.f - bright) * (1.f - bright) * (1.f - bright) * bright * 255.f);
