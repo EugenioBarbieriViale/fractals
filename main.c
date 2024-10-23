@@ -3,6 +3,12 @@
 
 #define square(x) (x)*(x)
 
+Vector2 diff(Vector2 w, Vector2 v);
+Vector2 sum(Vector2 w, Vector2 v);
+
+void mandelbrot();
+Color gradient(int n);
+
 const int X = 600;
 const int Y = 600;
 
@@ -14,46 +20,61 @@ const double zoomx = 3.f;
 
 const int max_iterations = 100;
 
-void mandelbrot();
-Color gradient(int n);
-
 int main() {
     InitWindow(X, Y, "Mandelbrot");
     SetTargetFPS(30);
 
     Camera2D camera = {0};
+    camera.offset = (Vector2){X/2, Y/2};
     camera.zoom = 1.0f;
-    camera.target = (Vector2){X/2, Y/2};
 
-    int W = X;
-    int H = Y;
+    Vector2 corner1;
+    Vector2 corner2;
+    Vector2 d;
+
+    bool select = false;
 
     while (!WindowShouldClose()) {
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            select = true;
+        }
+        else if (IsKeyPressed(KEY_ENTER)) {
+            select = false;
+        }
+
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             Vector2 delta = GetMouseDelta();
             delta = Vector2Scale(delta, -1.0f/camera.zoom);
             camera.target = Vector2Add(camera.target, delta);
         }
 
-        float wheel = GetMouseWheelMove();
-        if (wheel != 0) {
-            camera.offset = GetMousePosition();
+        if (select && !IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
 
-            float scale_factor = 1.0f + (0.25f * fabsf(wheel));
-            if (wheel < 0) 
-                scale_factor = 1.0f / scale_factor;
+            corner2 = sum(GetMousePosition(), camera.target);
+            d = diff(corner2, corner1);
 
-            camera.zoom = Clamp(camera.zoom * scale_factor, 0.125f, 64.0f);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+                corner1 = sum(GetMousePosition(), camera.target);
+                camera.zoom += d.y / d.x;
+            }
         }
 
         BeginDrawing();
+
         ClearBackground(BLACK);
 
             BeginMode2D(camera);
 
-                mandelbrot(W, H);
+                mandelbrot(X, Y);
 
             EndMode2D();
+
+        if (select && !IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            DrawRectangle(corner1.x - camera.target.x,
+                    corner1.y - camera.target.y, 
+                    d.x, d.y, (Color){0,0,255,80});
+        }
 
         EndDrawing();
     }
@@ -61,6 +82,15 @@ int main() {
     CloseWindow();
     return 0;
 }
+
+Vector2 diff(Vector2 w, Vector2 v) {
+    return (Vector2){w.x - v.x, w.y - v.y};
+}
+
+Vector2 sum(Vector2 w, Vector2 v) {
+    return (Vector2){w.x + v.x, w.y + v.y};
+}
+
 
 void mandelbrot(int X, int Y) {
     for (int y = -Y/2 - shifty; y < Y/2 + shifty; y++) {
